@@ -21,22 +21,28 @@ const getLinksFromFile = (path) => {
     // Regex emails
     const re = /\b(https?:\/\/\S*\b)/g;
     let lineNumber = 0;
+    const resultLinksAndLines = [];    
     rl.on("line", (line) => {
-      console.log(`${++lineNumber}: ${line}`);
-      const found = line.match(re);
-      console.log(found);
-      if (found != null) {
-        console.log("largo: " + found.length);
+      lineNumber++;
+      const foundLinks = line.match(re);
+      if (foundLinks != null){
+        foundLinks.forEach((link)=>{
+          const linkObject = {
+            line : lineNumber,
+            link : link,
+          }
+          resultLinksAndLines.push(linkObject);
+        })
       }
     });
     // End of file
     rl.on("close", () => {
-      resolve(lineNumber);
+      resolve(resultLinksAndLines);
     });
   });
 };
-// Consumo de promesa 
-getLinksFromFile("readmeTest.md").then((numberOfLines) => {
-  console.log(`Hay ${numberOfLines} lineas en este archivo`);
+
+getLinksFromFile("readmeTest.md").then((linksArray) => {
+  console.log(linksArray);
 });
 
