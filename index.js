@@ -2,8 +2,7 @@
 // Node libraries 
 const fs = require("fs");
 const readline = require("readline");
-const http = require('http');
-const { URL } = require('url');
+const fetch = require('node-fetch');
 
 /**
  * https://stackoverflow.com/questions/13104411/how-to-specify-resolution-and-rejection-type-of-the-promise-in-jsdoc
@@ -35,7 +34,6 @@ const getLinksFromFile = (path) => {
           file: path,
           text: match[1],
           link: match[2],
-
         }
         resultLinksAndLines.push(linkObject);
       }
@@ -56,32 +54,24 @@ const getLinksFromFile = (path) => {
  * @param {String} url url to validate
  * @returns {{ok: String, status: Number}} 
  */
-const getStatusForURl = (link) => {
+const getStatusForUrl = (link) => {
   return new Promise((resolve, reject) => {
     const result = {};
-    try {
-      const url = new URL(link);
-      const options = {
-        host: url.host,
-        path: url.pathname,
-        method: 'GET',
-      };
-      const req = http.request(options, (res) => {
-        result.status = res.statusCode;
-        result.ok = 'ok';
+    fetch(link)
+      .then((resp) => {
+        result.status = resp.status;
+        result.ok = resp.statusText;
         resolve(result);
-      });
-      req.on('error', (error) => {
-        result.ok = `fail: ${error.message}`;
+      }).catch((error) => {
+        result.ok = `fail: ${error}`;
         resolve(result);
-      });
-      req.end();
-    } catch (error) {
-      result.ok = `fail: ${error}`;
-      resolve(result);
-    }
-  });
+      })
+  })
 }
+// getStatusForUrl('https://giteBwlivndvsnjvjnkvnsdn.com/').then((result) => {
+//   console.log(result);
+// });
+
 /**
  * 
  * @param {String} path 
@@ -94,7 +84,7 @@ const mdLinks = (path, { validate }) => {
     return new Promise((resolve, reject) => {
       getLinksFromFile(path).then((arrayObjects) => {
         const promisesArray = arrayObjects.map((obj) => {
-          return getStatusForURl(obj.link);
+          return getStatusForUrl(obj.link);
         })
         //https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
         Promise.all(promisesArray).then((resolvedPromisesArray) => {
@@ -104,9 +94,7 @@ const mdLinks = (path, { validate }) => {
           }
           resolve(arrayObjects);
         })
-
       });
-
     })
   } else {
     return getLinksFromFile(path);
@@ -117,7 +105,4 @@ mdLinks("readmeTest.md", { validate: true }).then((linksArray) => {
   console.log(linksArray);
 });
 
-// getStatusForURl("https://aula.cdichile.org/mod/page/view.php?id=749&forceview=1").then(result => {
-//   console.log(result);
-// })
 
