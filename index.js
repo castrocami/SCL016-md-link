@@ -1,8 +1,9 @@
-// module.exports = () => {}
 // Node libraries 
 const fs = require("fs");
 const readline = require("readline");
 const fetch = require('node-fetch');
+const pathLib = require('path')
+
 
 /**
  * https://stackoverflow.com/questions/13104411/how-to-specify-resolution-and-rejection-type-of-the-promise-in-jsdoc
@@ -45,15 +46,16 @@ const getLinksFromFile = (path) => {
   });
 };
 
-/*getLinksFromFile("readmeTest.md").then((linksArray) => {
-  console.log(linksArray);
-});*/
+// getLinksFromFile("readmeTest.md").then((linksArray) => {
+//   console.log(linksArray);
+// });
 
 /**
  * 
  * @param {String} url url to validate
  * @returns {{ok: String, status: Number}} 
  */
+//https://www.npmjs.com/package/node-fetch
 const getStatusForUrl = (link) => {
   return new Promise((resolve, reject) => {
     const result = {};
@@ -78,31 +80,67 @@ const getStatusForUrl = (link) => {
  * @param {{validate: Boolean}} options 
  */
 const mdLinks = (path, { validate }) => {
-  if (validate) {
-    //crear promesa que llame a getlinks from file... obtener el resultado y por cada item llamar a funcion que valide el link y cuando
-    //todo eso haya terminado resuelvo la promesa
+  // https://stackoverflow.com/questions/15630770/node-js-check-if-path-is-file-or-directory
+  if (fs.lstatSync(path).isFile() && pathLib.extname(path) === '.md') {
+    if (validate) {
+      return new Promise((resolve, reject) => {
+        getLinksFromFile(path).then((arrayObjects) => {
+          const promisesArray = arrayObjects.map((obj) => {
+            return getStatusForUrl(obj.link);
+          })
+          //https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+          Promise.all(promisesArray).then((resolvedPromisesArray) => {
+            for (let i = 0; i < arrayObjects.length; i++) {
+              // https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+              Object.assign(arrayObjects[i], resolvedPromisesArray[i]);
+            }
+            resolve(arrayObjects);
+          })
+        });
+      })
+    } else {
+      return getLinksFromFile(path);
+    }
+  } else if (fs.lstatSync(path).isDirectory()) {
+    /* Pseudocodigo: 
+    para cada elemento "e" de cada carpeta iterar
+    si es una carpeta o un md , llamar a la funcion denuevo pasandole e...lo que devuelva agregar al arreglo
+    sino ignoro*/
     return new Promise((resolve, reject) => {
-      getLinksFromFile(path).then((arrayObjects) => {
-        const promisesArray = arrayObjects.map((obj) => {
-          return getStatusForUrl(obj.link);
+      // crear arreglo vacio para guardar resultados
+      const dirTotalLinks = [];
+      fs.readdir(path, function (err, files) {
+        if (err) {
+          console.error("Could not list the directory.", err);
+          process.exit(1);
+        }
+        const promisesFilesArray = files.map((eachFile) => {
+          return mdLinks(`${path}/${eachFile}`, { validate: validate });
         })
-        //https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-        Promise.all(promisesArray).then((resolvedPromisesArray) => {
-          for (let i = 0; i < arrayObjects.length; i++) {
-            // https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-            Object.assign(arrayObjects[i], resolvedPromisesArray[i]);
-          }
-          resolve(arrayObjects);
+        Promise.all(promisesFilesArray).then((resolvedMdLinks) => {
+          resolvedMdLinks.forEach(arr => {
+            dirTotalLinks.push(...arr);
+          })
+          resolve(dirTotalLinks);
         })
-      });
+      })
     })
   } else {
-    return getLinksFromFile(path);
+    return new Promise((resolve, reject) => {
+      resolve([]);
+    })
   }
 };
 
-mdLinks("readmeTest.md", { validate: true }).then((linksArray) => {
+
+mdLinks("./hola", { validate: true }).then((linksArray) => {
   console.log(linksArray);
 });
 
 
+
+module.exports = {
+  getLinksFromFile,
+  getStatusForUrl,
+  mdLinks,
+}
