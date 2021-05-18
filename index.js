@@ -102,10 +102,6 @@ const mdLinks = (path, { validate }) => {
       return getLinksFromFile(path);
     }
   } else if (fs.lstatSync(path).isDirectory()) {
-    /* Pseudocodigo: 
-    para cada elemento "e" de cada carpeta iterar
-    si es una carpeta o un md , llamar a la funcion denuevo pasandole e...lo que devuelva agregar al arreglo
-    sino ignoro*/
     return new Promise((resolve, reject) => {
       // crear arreglo vacio para guardar resultados
       const dirTotalLinks = [];

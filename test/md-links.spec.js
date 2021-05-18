@@ -1,5 +1,6 @@
 const { getLinksFromFile, getStatusForUrl, mdLinks } = require('../index.js');
 
+// Get Status for url
 jest.mock('node-fetch'); // mockear la libreria 
 const fetch = require('node-fetch'); // cuando la importo , estoy importando la libreria mockeada
 describe('getStatusForUrl', () => {
@@ -24,6 +25,7 @@ describe('getStatusForUrl', () => {
   });
 });
 
+// Get Links from File
 describe('getLinksFromFile', () => {
   it('should be a function', () => {
     expect(typeof getLinksFromFile).toBe('function');
@@ -35,6 +37,7 @@ describe('getLinksFromFile', () => {
   })
 });
 
+//Md-Links
 describe('mdLinks', () => {
   it('should be a function', () => {
     expect(typeof mdLinks).toBe('function');
