@@ -129,9 +129,9 @@ const mdLinks = (path, { validate }) => {
 };
 
 
-mdLinks("./hola", { validate: true }).then((linksArray) => {
-  console.log(linksArray);
-});
+// mdLinks("./hola", { validate: true }).then((linksArray) => {
+//   console.log(linksArray);
+// });
 
 
 
