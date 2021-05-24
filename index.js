@@ -45,7 +45,6 @@ const getLinksFromFile = (path) => {
     });
   });
 };
-
 // getLinksFromFile("readmeTest.md").then((linksArray) => {
 //   console.log(linksArray);
 // });
@@ -65,7 +64,7 @@ const getStatusForUrl = (link) => {
         result.ok = resp.statusText;
         resolve(result);
       }).catch((error) => {
-        result.ok = `fail: ${error}`;
+        result.ok = `fail`;
         resolve(result);
       })
   })
@@ -127,8 +126,6 @@ const mdLinks = (path, { validate }) => {
     })
   }
 };
-
-
 // mdLinks("./hola", { validate: true }).then((linksArray) => {
 //   console.log(linksArray);
 // });
