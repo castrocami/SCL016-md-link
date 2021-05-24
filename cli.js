@@ -25,52 +25,41 @@ if (!options.validate && !options.stats) {
 } else if (options.validate && !options.stats) {
   mdLinks(`${args[0]}`, { validate: true }).then((linksArray) => {
     console.table(linksArray);
-    // linksArray.forEach(obj => {
-    //   if (obj.link == null) {
-    //     console.log(`${obj.file}: ${obj.line} ${obj.text} ${obj.link} ${obj.ok}`)
-    //   }
-    //   console.log(` ${obj.file}: ${obj.line} ${obj.text} ${obj.link} ${obj.ok} ${obj.status}`)
-    // });
   });
   // -- stats
 } else if (options.stats && !options.validate) {
   mdLinks(`${args[0]}`, { validate: true }).then((linksArray) => {
-    let totalLinks = 0;
-    let uniqueLinks = 0;
-    totalLinks = linksArray.length;
-    console.log(`Total: ${totalLinks}`);
-    const o = {};
-    linksArray.forEach(element => {
-      if (o[element.link] == null) {
-        uniqueLinks++;
-      };
-      o[element.link] = true;
-    });
-    console.log(`Unique: ${uniqueLinks}`);
+    const finalResume = resumeStatus(linksArray)
+    console.log(`Total: ${finalResume.totalLinks} \nUnique: ${finalResume.uniqueLinks}`);
   });
   // --validate --stats
 } else if (options.stats && options.validate) {
   mdLinks(`${args[0]}`, { validate: true }).then((linksArray) => {
-    let totalLinks = 0;
-    let uniqueLinks = 0;
-    let brokenLinks = 0;
-    totalLinks = linksArray.length;
-    console.log(`Total: ${totalLinks}`);
-    const o = {};
-    linksArray.forEach(element => {
-      if (o[element.link] == null) {
-        uniqueLinks++;
-      };
-      o[element.link] = true;
-      if (element.ok.includes('fail')) {
-        brokenLinks++;
-      }
-    });
-    console.log(`Unique: ${uniqueLinks}`);
-    console.log(`Broken: ${brokenLinks}`)
+    const finalResume = resumeStatus(linksArray)
+    console.log(`Total: ${finalResume.totalLinks} \nUnique: ${finalResume.uniqueLinks} \nBroken: ${finalResume.brokenLinks} `);
   });
 }
 
 
+// Resume status for some options
+const resumeStatus = (objectArray) => {
+  const resumeObject = {
+    totalLinks: 0,
+    uniqueLinks: 0,
+    brokenLinks: 0,
+  };
+  resumeObject.totalLinks = objectArray.length;
+  const o = {};
+  objectArray.forEach(element => {
+    if (o[element.link] == null) {
+      resumeObject.uniqueLinks++;
+    };
+    o[element.link] = true;
+    if (element.ok.includes('fail')) {
+      resumeObject.brokenLinks++;
+    }
+  });
+  return resumeObject;
+}
 
 
