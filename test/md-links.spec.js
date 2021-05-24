@@ -50,7 +50,12 @@ describe('mdLinks', () => {
   it('should resolve to an object when validate is false', () => {
     return mdLinks("readmeTest.md", { validate: false }).then(finalResult => {
       expect(typeof finalResult).toBe('object');
-      console.log(finalResult)
+    })
+  })
+  it('should return a object', () => {
+    return mdLinks("./hola", { validate: false }).then(totalLinks => {
+      expect(typeof totalLinks).toBe('object');
+      console.log(totalLinks)
     })
   })
 });
