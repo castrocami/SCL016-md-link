@@ -11,7 +11,7 @@ const options = program.opts();
 // Get path argument
 const [, , ...args] = process.argv;
 if (args.length > 4 || args.length == 0) {
-  console.log("Please enter exactly one argument")
+  console.log("Please enter  one argument")
   return;
 }
 
