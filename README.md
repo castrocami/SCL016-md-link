@@ -32,7 +32,7 @@ Algunos de los links accedidos en orden  temporal según necesidad fueron:
 ## Guía de uso e instalación de la librería
 
 * Instalación:
-> npm install <github-user>/https://github.com/castrocami/SCL016-md-link
+> npm install <github-user> https://github.com/castrocami/SCL016-md-link
 
 * Guía de uso:
 
