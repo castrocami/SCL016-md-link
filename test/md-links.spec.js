@@ -20,7 +20,7 @@ describe('getStatusForUrl', () => {
       return Promise.reject("Error calling fetch");
     });
     getStatusForUrl("okurl").then(obj => {
-      expect(obj.ok).toBe('fail: Error calling fetch');
+      expect(obj.ok).toBe('fail');
     });
   });
 });
